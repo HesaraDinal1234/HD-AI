@@ -57,50 +57,39 @@
     </div>
 
     <script>
-        // This function sends the message to the API and handles the response
         function sendMessage() {
-            const userInput = document.getElementById("userInput").value; // Get user input
+            const userInput = document.getElementById("userInput").value;
             const chatBox = document.getElementById("chatBox");
 
-            if (userInput === "") return; // Do nothing if input is empty
+            if (userInput === "") return;
 
-            // Display the user's message in the chat box
             chatBox.innerHTML += `<p><strong>You:</strong> ${userInput}</p>`;
-            document.getElementById("userInput").value = ""; // Clear input field
-
-            // Display "Typing..." while waiting for a response
+            document.getElementById("userInput").value = "";
             chatBox.innerHTML += `<p><strong>Bot:</strong> Typing...</p>`;
 
-            // Send the message to the chatbot API
             fetch("https://api.aimlapi.com/v1/chat/completions", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": "Bearer b79d2ec7e07046ea96e30564b4d8eb23" // Use your own API key here
+                    "Authorization": "Bearer b79d2ec7e07046ea96e30564b4d8eb23"
                 },
                 body: JSON.stringify({
                     model: "deepseek/deepseek-r1",
                     messages: [{ role: "user", content: userInput }]
                 })
             })
-            .then(response => response.json()) // Parse JSON response
+            .then(response => response.json())
             .then(data => {
-                // Remove "Typing..." message
                 chatBox.innerHTML = chatBox.innerHTML.replace('<p><strong>Bot:</strong> Typing...</p>', '');
-
-                // If response exists, display it, otherwise show an error message
                 if (data.choices && data.choices.length > 0) {
                     chatBox.innerHTML += `<p><strong>Bot:</strong> ${data.choices[0].message.content}</p>`;
                 } else {
                     chatBox.innerHTML += `<p><strong>Bot:</strong> No response received.</p>`;
                 }
-
-                // Scroll to the bottom of the chat box
                 chatBox.scrollTop = chatBox.scrollHeight;
             })
             .catch(error => {
                 console.error("Error:", error);
-                // If there's an error, show a message in the chat box
                 chatBox.innerHTML = chatBox.innerHTML.replace('<p><strong>Bot:</strong> Typing...</p>', '');
                 chatBox.innerHTML += `<p><strong>Bot:</strong> Error connecting to API.</p>`;
                 chatBox.scrollTop = chatBox.scrollHeight;
